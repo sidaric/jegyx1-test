@@ -57,7 +57,7 @@ chmod +x install.sh
 Telepítés indítása:
 
 ./install.sh
-
+(bash install.sh)
 
 A script automatikusan elvégzi:
 
