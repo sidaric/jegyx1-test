@@ -142,9 +142,13 @@ Tulajdonságok:
 API endpointok:
 
 GET  /api/menus/tree
+
 GET  /api/menus
+
 POST /api/menus
+
 PUT  /api/menus/{id}
+
 DELETE /api/menus/{id}
 
 
