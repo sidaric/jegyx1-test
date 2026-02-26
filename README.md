@@ -3,130 +3,130 @@
 Ez a projekt a Jegyx1 próbafeladat megoldása.
 
 A rendszer egy egyszerű admin alkalmazás CodeIgniter 4 keretrendszerben, Vue.js frontenddel.
+A telepítés automatizált, egyetlen script futtatásával elvégezhető.
 
-Tartalmaz:
-- Bejelentkezési felület validációval
-- Growl (toast) üzenetek sikeres/hibás login esetén
-- Session alapú authentikáció
-- Hierarchikus (többszintű) menürendszer
-- Rekurzív menü felépítés
-- MySQL feladatok (táblák + lekérdezések)
+Az install script telepíti a szükséges komponenseket, létrehozza az adatbázist, importálja az adatokat és elindítja az alkalmazást.
 
 
 --------------------------------------------------
 
-Követelmények
+## Követelmények
 
-- PHP 8.1+
+A projekt Linux vagy WSL környezetben fut.
+
+Ajánlott:
+
+- WSL Ubuntu
+- Internet kapcsolat
+
+Nem szükséges előre telepíteni:
+
+- PHP
 - Composer
-- MySQL vagy MariaDB
+- MySQL / MariaDB
+- Git
+
+Az install script automatikusan telepíti a szükséges csomagokat.
 
 
 --------------------------------------------------
 
-Telepítés
+## Projekt letöltése
 
+WSL terminálban:
 
-1. Függőségek telepítése
+mkdir -p ~/projects
+cd ~/projects
 
-composer install
+git clone https://github.com/sidaric/jegyx1-test.git
 
-
---------------------------------------------------
-
-2. Környezet beállítása
-
-.env fájl létrehozása:
-
-cp env .env
-
-
-.env fájl módosítása:
-
-CI_ENVIRONMENT = development
-
-app.baseURL = 'http://localhost:8080/'
-
-database.default.hostname = localhost
-
-database.default.database = ci_admin_test
-
-database.default.username = ciuser
-
-database.default.password = cipass
-
-database.default.DBDriver = MySQLi
-
-database.default.port = 3306
+cd jegyx1-test
 
 
 --------------------------------------------------
 
-3. Adatbázis létrehozása
+## Automatikus telepítés
 
-CREATE DATABASE ci_admin_test CHARACTER SET utf8mb4;
+A teljes rendszer telepíthető egyetlen paranccsal.
+
+Első futtatás előtt:
+
+chmod +x install.sh
+
+
+Telepítés indítása:
+
+./install.sh
+
+
+A script automatikusan elvégzi:
+
+- szükséges csomagok telepítése (PHP, Composer, MariaDB)
+- MariaDB elindítása
+- adatbázis létrehozása
+- adatbázis user létrehozása
+- .env fájl létrehozása
+- composer install futtatása
+- adatbázis schema importálása
+- dummy adatok feltöltése
+- admin felhasználó létrehozása
+- fejlesztői szerver elindítása
 
 
 --------------------------------------------------
 
-4. Adatbázis import
+## Az alkalmazás elérése
 
-mysql -u ciuser -pcipass ci_admin_test < database/01_schema_admin.sql
+Telepítés után az alkalmazás automatikusan elindul.
 
-mysql -u ciuser -pcipass ci_admin_test < database/02_seed_admin.sql
+Böngészőben:
 
-mysql -u ciuser -pcipass ci_admin_test < database/03_schema_tasks.sql
-
-mysql -u ciuser -pcipass ci_admin_test < database/04_dummy_tasks.sql
-
-
---------------------------------------------------
-
-5. Admin felhasználó létrehozása
-
-php spark seed:admin
+http://localhost:8080/login
 
 
 Belépési adatok:
 
 nickname: admin
-
 password: admin1234
 
 
 --------------------------------------------------
 
-6. Szerver indítása
+## A szerver leállítása
+
+A szerver addig fut amíg a terminál nyitva van.
+
+Leállítás:
+
+CTRL + C
+
+
+Újraindítás:
 
 php spark serve --host 0.0.0.0 --port 8080
 
 
-Megnyitás:
-
-http://localhost:8080/login
-
-
 --------------------------------------------------
 
-Funkciók
+## Funkciók
 
 
 Bejelentkezés
 
-- nickname + jelszó mezők
+- nickname és jelszó mező
 - szerver oldali validáció
 - kliens oldali validáció (Vue)
 - CSRF védelem
-- hibás adatok esetén hibaüzenet
-- sikeres login után átirányítás admin oldalra
-- growl (toast) üzenetek
+- hibás belépés esetén hibaüzenet
+- sikeres belépés után átirányítás
+- toast (growl) üzenetek
 
 
 --------------------------------------------------
 
 Menürendszer
 
-A rendszer hierarchikus menüstruktúrát kezel.
+Az admin felületen egy dinamikus hierarchikus menürendszer kezelhető.
 
 Tulajdonságok:
 
@@ -135,28 +135,24 @@ Tulajdonságok:
 - rekurzív felépítés backend oldalon
 - rekurzív megjelenítés Vue komponenssel
 - új menüpont létrehozása
-- validáció
+- űrlap validáció
 - hibakezelés
 
 
 API endpointok:
 
-GET  /api/menus/tree
-
-GET  /api/menus
-
-POST /api/menus
-
-PUT  /api/menus/{id}
-
+GET    /api/menus/tree
+GET    /api/menus
+POST   /api/menus
+PUT    /api/menus/{id}
 DELETE /api/menus/{id}
 
 
 --------------------------------------------------
 
-MySQL feladat
+## MySQL feladat
 
-Táblák:
+A feladatban szereplő táblák:
 
 - esemenyek
 - jegyek
@@ -165,7 +161,7 @@ Táblák:
 - tranzakcio_fizetesi_modok
 
 
-Schema:
+Schema fájl:
 
 database/03_schema_tasks.sql
 
@@ -180,14 +176,14 @@ Lekérdezések:
 database/05_queries_tasks.sql
 
 
-Futtatás:
+Lekérdezések futtatása:
 
 mysql -u ciuser -pcipass ci_admin_test < database/05_queries_tasks.sql
 
 
 --------------------------------------------------
 
-Projekt felépítés
+## Projekt felépítés
 
 
 app/
@@ -206,6 +202,7 @@ app/
 
 
 database/
+
   01_schema_admin.sql
   02_seed_admin.sql
   03_schema_tasks.sql
@@ -213,12 +210,36 @@ database/
   05_queries_tasks.sql
 
 
+install.sh
+
+
 --------------------------------------------------
 
-Megjegyzések
+## Gyors teszt
 
-- A Model réteg nem került használatra a feladat kiírása szerint.
-- A logika a LoginController-ben található.
-- A frontend Vue.js alapú.
-- A design Bootstrap alapú minimális CSS-sel.
+Telepítés után:
 
+1) megnyitás:
+
+http://localhost:8080/login
+
+
+2) belépés:
+
+admin / admin1234
+
+
+3) menüpont létrehozása az admin oldalon
+
+
+--------------------------------------------------
+
+## Megjegyzések
+
+A Model réteg szándékosan nincs használva a feladat kiírása szerint.
+
+Az alkalmazás logikája a LoginController-ben található.
+
+A frontend Vue.js alapú.
+
+A design Bootstrap alapú minimális CSS-sel.
