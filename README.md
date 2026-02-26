@@ -48,10 +48,15 @@ CI_ENVIRONMENT = development
 app.baseURL = 'http://localhost:8080/'
 
 database.default.hostname = localhost
+
 database.default.database = ci_admin_test
+
 database.default.username = ciuser
+
 database.default.password = cipass
+
 database.default.DBDriver = MySQLi
+
 database.default.port = 3306
 
 
@@ -67,8 +72,11 @@ CREATE DATABASE ci_admin_test CHARACTER SET utf8mb4;
 4. Adatbázis import
 
 mysql -u ciuser -pcipass ci_admin_test < database/01_schema_admin.sql
+
 mysql -u ciuser -pcipass ci_admin_test < database/02_seed_admin.sql
+
 mysql -u ciuser -pcipass ci_admin_test < database/03_schema_tasks.sql
+
 mysql -u ciuser -pcipass ci_admin_test < database/04_dummy_tasks.sql
 
 
@@ -82,6 +90,7 @@ php spark seed:admin
 Belépési adatok:
 
 nickname: admin
+
 password: admin1234
 
 
