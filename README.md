@@ -1,69 +1,211 @@
-# CodeIgniter 4 Application Starter
+# Jegyx1 próbafeladat – CodeIgniter 4 admin alkalmazás
 
-## What is CodeIgniter?
+Ez a projekt a Jegyx1 próbafeladat megoldása.
 
-CodeIgniter is a PHP full-stack web framework that is light, fast, flexible and secure.
-More information can be found at the [official site](https://codeigniter.com).
+A rendszer egy egyszerű admin alkalmazás CodeIgniter 4 keretrendszerben, Vue.js frontenddel.
 
-This repository holds a composer-installable app starter.
-It has been built from the
-[development repository](https://github.com/codeigniter4/CodeIgniter4).
+Tartalmaz:
+- Bejelentkezési felület validációval
+- Growl (toast) üzenetek sikeres/hibás login esetén
+- Session alapú authentikáció
+- Hierarchikus (többszintű) menürendszer
+- Rekurzív menü felépítés
+- MySQL feladatok (táblák + lekérdezések)
 
-More information about the plans for version 4 can be found in [CodeIgniter 4](https://forum.codeigniter.com/forumdisplay.php?fid=28) on the forums.
 
-You can read the [user guide](https://codeigniter.com/user_guide/)
-corresponding to the latest version of the framework.
+--------------------------------------------------
 
-## Installation & updates
+Követelmények
 
-`composer create-project codeigniter4/appstarter` then `composer update` whenever
-there is a new release of the framework.
+- PHP 8.1+
+- Composer
+- MySQL vagy MariaDB
 
-When updating, check the release notes to see if there are any changes you might need to apply
-to your `app` folder. The affected files can be copied or merged from
-`vendor/codeigniter4/framework/app`.
 
-## Setup
+--------------------------------------------------
 
-Copy `env` to `.env` and tailor for your app, specifically the baseURL
-and any database settings.
+Telepítés
 
-## Important Change with index.php
 
-`index.php` is no longer in the root of the project! It has been moved inside the *public* folder,
-for better security and separation of components.
+1. Függőségek telepítése
 
-This means that you should configure your web server to "point" to your project's *public* folder, and
-not to the project root. A better practice would be to configure a virtual host to point there. A poor practice would be to point your web server to the project root and expect to enter *public/...*, as the rest of your logic and the
-framework are exposed.
+composer install
 
-**Please** read the user guide for a better explanation of how CI4 works!
 
-## Repository Management
+--------------------------------------------------
 
-We use GitHub issues, in our main repository, to track **BUGS** and to track approved **DEVELOPMENT** work packages.
-We use our [forum](http://forum.codeigniter.com) to provide SUPPORT and to discuss
-FEATURE REQUESTS.
+2. Környezet beállítása
 
-This repository is a "distribution" one, built by our release preparation script.
-Problems with it can be raised on our forum, or as issues in the main repository.
+.env fájl létrehozása:
 
-## Server Requirements
+cp env .env
 
-PHP version 8.2 or higher is required, with the following extensions installed:
 
-- [intl](http://php.net/manual/en/intl.requirements.php)
-- [mbstring](http://php.net/manual/en/mbstring.installation.php)
+.env fájl módosítása:
 
-> [!WARNING]
-> - The end of life date for PHP 7.4 was November 28, 2022.
-> - The end of life date for PHP 8.0 was November 26, 2023.
-> - The end of life date for PHP 8.1 was December 31, 2025.
-> - If you are still using below PHP 8.2, you should upgrade immediately.
-> - The end of life date for PHP 8.2 will be December 31, 2026.
+CI_ENVIRONMENT = development
 
-Additionally, make sure that the following extensions are enabled in your PHP:
+app.baseURL = 'http://localhost:8080/'
 
-- json (enabled by default - don't turn it off)
-- [mysqlnd](http://php.net/manual/en/mysqlnd.install.php) if you plan to use MySQL
-- [libcurl](http://php.net/manual/en/curl.requirements.php) if you plan to use the HTTP\CURLRequest library
+database.default.hostname = localhost
+database.default.database = ci_admin_test
+database.default.username = ciuser
+database.default.password = cipass
+database.default.DBDriver = MySQLi
+database.default.port = 3306
+
+
+--------------------------------------------------
+
+3. Adatbázis létrehozása
+
+CREATE DATABASE ci_admin_test CHARACTER SET utf8mb4;
+
+
+--------------------------------------------------
+
+4. Adatbázis import
+
+mysql -u ciuser -pcipass ci_admin_test < database/01_schema_admin.sql
+mysql -u ciuser -pcipass ci_admin_test < database/02_seed_admin.sql
+mysql -u ciuser -pcipass ci_admin_test < database/03_schema_tasks.sql
+mysql -u ciuser -pcipass ci_admin_test < database/04_dummy_tasks.sql
+
+
+--------------------------------------------------
+
+5. Admin felhasználó létrehozása
+
+php spark seed:admin
+
+
+Belépési adatok:
+
+nickname: admin
+password: admin1234
+
+
+--------------------------------------------------
+
+6. Szerver indítása
+
+php spark serve --host 0.0.0.0 --port 8080
+
+
+Megnyitás:
+
+http://localhost:8080/login
+
+
+--------------------------------------------------
+
+Funkciók
+
+
+Bejelentkezés
+
+- nickname + jelszó mezők
+- szerver oldali validáció
+- kliens oldali validáció (Vue)
+- CSRF védelem
+- hibás adatok esetén hibaüzenet
+- sikeres login után átirányítás admin oldalra
+- growl (toast) üzenetek
+
+
+--------------------------------------------------
+
+Menürendszer
+
+A rendszer hierarchikus menüstruktúrát kezel.
+
+Tulajdonságok:
+
+- tetszőleges mélységű menü
+- parent-child kapcsolat
+- rekurzív felépítés backend oldalon
+- rekurzív megjelenítés Vue komponenssel
+- új menüpont létrehozása
+- validáció
+- hibakezelés
+
+
+API endpointok:
+
+GET  /api/menus/tree
+GET  /api/menus
+POST /api/menus
+PUT  /api/menus/{id}
+DELETE /api/menus/{id}
+
+
+--------------------------------------------------
+
+MySQL feladat
+
+Táblák:
+
+- esemenyek
+- jegyek
+- tranzakciok
+- tranzakcio_elemek
+- tranzakcio_fizetesi_modok
+
+
+Schema:
+
+database/03_schema_tasks.sql
+
+
+Dummy adatok:
+
+database/04_dummy_tasks.sql
+
+
+Lekérdezések:
+
+database/05_queries_tasks.sql
+
+
+Futtatás:
+
+mysql -u ciuser -pcipass ci_admin_test < database/05_queries_tasks.sql
+
+
+--------------------------------------------------
+
+Projekt felépítés
+
+
+app/
+  Controllers/
+    LoginController.php
+
+  Filters/
+    AuthFilter.php
+
+  Commands/
+    SeedAdminUser.php
+
+  Views/
+    login.php
+    admin.php
+
+
+database/
+  01_schema_admin.sql
+  02_seed_admin.sql
+  03_schema_tasks.sql
+  04_dummy_tasks.sql
+  05_queries_tasks.sql
+
+
+--------------------------------------------------
+
+Megjegyzések
+
+- A Model réteg nem került használatra a feladat kiírása szerint.
+- A logika a LoginController-ben található.
+- A frontend Vue.js alapú.
+- A design Bootstrap alapú minimális CSS-sel.
+
